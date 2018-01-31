@@ -1,0 +1,4 @@
+tags$head(tags$style(HTML('
+      body > .content-wrapper,
+              .left-side {background-color: #00BFFF;
+                          }'))),

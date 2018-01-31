@@ -15,8 +15,6 @@ function(input, output, session)  {
     return(CRS)
   })
   
-  
-#############################################################################################################
 ##########################################################################################################
 ###############################################Render Statistic Summary - Histogram############################
   output$histogram <- renderPlot({
@@ -29,7 +27,7 @@ function(input, output, session)  {
   })
   
 ###########################################################################################################
-###########################################################################################################
+##########################################Render Statistic Summary - Scatter Plot############################
 
   output$metric <- renderPlotly({
   
@@ -39,18 +37,12 @@ function(input, output, session)  {
         geom_jitter(mapping = aes(x = Cap.Rate, y = BuildingClass, color = MarketOrientation)) + 
         labs(title = "Cap Rate (%) Distribution by Building Class and Market Orientation") + theme(legend.title = element_blank())
          
-        #Alternative Chart#
-        #ggplot(data = hist.table) +
-        #geom_density(aes(x = Cap.Rate, color = BuildingClass), kernel = "gaussian", adjust = 4)
-        #ggplot(data=hist.table, aes(x=BuildingClass, y=Cap.Rate)) + 
-         #geom_boxplot(alpha = .6,fill="cadetblue4") + geom_jitter(alpha=.4,color = "tomato") +
-         #facet_grid(MarketOrientation~.) + labs(x = "",title = "Cap Rate (%) by Building Class and Market Orientation")
       p
       
   })
 ###########################################################################################################
 ###########################################################################################################
-### EDA KPI's
+####################################################EDA KPI's##############################################
   output$twentyfifth_subbox <- renderValueBox({
     infotable = ValuationRateSummary()
     x = infotable[,input$Metric]
@@ -113,7 +105,7 @@ function(input, output, session)  {
     pchart
   })
 ###########################################################################################################  
-###########################################################################################################
+##############################################Market Comparison2 - Reactive Function#######################
   
  boxplotSummary1 <- reactive({
     CRS <- 
@@ -124,8 +116,9 @@ function(input, output, session)  {
     
     return(CRS)
   })
+  
 #############################################################################################################
-###############################################Render Cap Rate Submarket Summary############################
+###############################################Render Plotly Box Plot Summary###############################
 
   output$boxplot1 <- renderPlotly({
     boxplot.table = boxplotSummary1()
@@ -134,8 +127,9 @@ function(input, output, session)  {
     p = ggplot(x, aes(x = Submarket,y = Cap.Rate)) + geom_boxplot() + coord_flip()
     p
   })
+  
 ###########################################################################################################  
-###########################################################################################################
+###################################Market Comparison - Reactive Function###################################
   CapRateSummary <- reactive({
     CRS <- 
       new.mpv %>% 
@@ -153,7 +147,7 @@ function(input, output, session)  {
     return(CRS)
   })
 #############################################################################################################
-###############################################Render Cap Rate Submarket Summary############################
+###############################################Render Cap Rate Market Comparison############################
   output$comparison <- renderPlotly({
     y <- list(title = "")
     
@@ -177,7 +171,7 @@ function(input, output, session)  {
   })
 
 #############################################################################################################
-###############################################Render Submarket Cap Rate Comparison############################
+###############################################Render BoxPlot Market Rate Comparison############################
   output$boxplot <- renderPlotly({
       boxplot.table = boxplotSummary()
       x = boxplot.table %>% select(Submarket,Cap.Rate)
@@ -188,7 +182,7 @@ function(input, output, session)  {
       p
   })
 ###########################################################################################################  
-################################# Reactive Function - Market Comparison #########################################################
+################################# Reactive Function - Market Comparison ###################################
   marketratesummary <- reactive({
     CRS <- 
       new.mpv %>% 
@@ -223,9 +217,9 @@ function(input, output, session)  {
       labs(title = paste("Market Rent ($/SF) by Space Type for",input$market10)) + theme(legend.title = element_blank())
     p
   })
-  ###########################################################################################################  
-  ###########################################################################################################  
-  # show statistics using infoBox
+###########################################################################################################  
+###########################################################################################################  
+###Show statistics using infoBox###
   output$avgBox <- renderInfoBox({
     infotable = marketratesummary() %>% 
       filter(!is.na(AverageMarketRent)) %>% 
@@ -235,7 +229,6 @@ function(input, output, session)  {
 
   })
   
-  # show statistics using infoBox
   output$avgBox1 <- renderInfoBox({
     infotable = marketratesummary1() %>% 
       filter(!is.na(AverageMarketRent)) %>% 
@@ -245,7 +238,7 @@ function(input, output, session)  {
   })
 
 
-#################################Cap Rate Summary##########################################################
+#################################Data Table Reactive##########################################################
   datasetInput <- reactive({
     CRS <- 
       new.mpv %>% 
@@ -253,15 +246,11 @@ function(input, output, session)  {
              & BuildingClass == input$BuildingClass2 & MarketOrientation == input$MarketOrientation2 
              & Market == input$Market2)
     
-      #Following code slows the map functionality down#
-      # select(PropertyName,EffectiveDate = EffectiveDate2,PropertyType,SubType,SpecificUse,State,
-      #        CityMunicipality,Market,Submarket,MarketOrientation,GrossBuildingAreaSF,
-      #        BuildingClass,InterestAppraised,Cap.Rate,NOI.PerSF,Value.PerSFGLA)
     return(CRS)
   })  
   ######################################################################################################
   #######################################################################################################
-  # show data using DataTable
+  # show data using DataTable Render
   output$table <- DT::renderDataTable({
     x = datasetInput() %>% select(PropertyName,PropertyType,SubType,SpecificUse,State,CityMunicipality,
               Market,Submarket,MarketOrientation,GrossBuildingAreaSF,
@@ -279,6 +268,8 @@ function(input, output, session)  {
       }
      )
 
+   #######################################################################################################
+   # show map using leafleet Render
   output$mymap <- renderLeaflet({
     df = datasetInput()
     leaflet(df) %>%

@@ -1,3 +1,6 @@
+###NYCDSA Bootcamp 12, R Shiny Project###
+###Raj Tiwari###
+
 library(shiny)
 library(data.table)
 library(dplyr)
@@ -15,13 +18,8 @@ library(plotly)
 
 mpv = fread("mpv.csv", stringsAsFactors = F)
 new.mpv <- mpv %>% filter(.,
-                  PropertyType %in% c("Industrial","Retail","Office","Hotel","Self Storage","Senior Housing","Multifamily") 
-                  #Eliminates Land & Other Specialty Property Types
-                  #BuildingClass != "" & #Only records with a valid Building Class
-                  #InterestAppraised == "Fee Simple"
-                  #Market != "" #Eliminates records not tagged to a market
-                          
-)
+                  PropertyType %in% c("Industrial","Retail","Office","Hotel","Self Storage","Senior Housing","Multifamily"))
+
 attach(new.mpv)
 
 
